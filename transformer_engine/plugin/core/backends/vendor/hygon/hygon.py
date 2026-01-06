@@ -47,6 +47,7 @@ def _load_hygon_libs():
         solib = importlib.util.module_from_spec(spec)
         sys.modules[csrc_prefix] = solib
         spec.loader.exec_module(solib)
+        return True
     except Exception as e:
         print(f"[HYGON] Failed to load hygon libs: {e}")
         return False
