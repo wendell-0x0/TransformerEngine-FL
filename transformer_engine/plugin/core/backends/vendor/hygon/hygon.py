@@ -14,8 +14,9 @@ def _load_hygon_libs():
     from pathlib import Path
     import importlib
     import platform
+    import os
     common_prefix = "libtransformer_engine"
-    csrc_prefix = "transformer_engine_fl_torch_hygon"
+    csrc_prefix = "transformer_engine_torch_hygon"
     common_files = []
     csrc_files = []
     def _get_sys_extension() -> str:
@@ -28,8 +29,10 @@ def _load_hygon_libs():
             return ".dll"
         raise RuntimeError(f"Unsupported operating system ({system})")
     try:
+        if bool(int(os.environ.get("TE_FL_SKIP_HYGON", "0"))):
+            return False
         ext = _get_sys_extension()
-        hygon_spec = importlib.util.find_spec("transformer_engine_fl_hygon")
+        hygon_spec = importlib.util.find_spec("transformer_engine_hygon")
         if hygon_spec is None:
             return False
         hygon_path = Path(hygon_spec.origin).parent
@@ -64,7 +67,7 @@ def _check_hygon_available() -> bool:
     try:
         if not _ensure_hygon_libs():
             return False
-        import transformer_engine_fl_torch_hygon
+        import transformer_engine_torch_hygon
         return True
     except (ImportError, OSError) as e:
         print(f"[HYGON] Import failed: {e}")
@@ -72,15 +75,15 @@ def _check_hygon_available() -> bool:
 
 def _get_tex():
     _ensure_hygon_libs()
-    import transformer_engine_fl_torch_hygon
-    return transformer_engine_fl_torch_hygon
+    import transformer_engine_torch_hygon
+    return transformer_engine_torch_hygon
 
 def _torch_dtype_to_te_dtype(torch_dtype, tex_module):
     if torch_dtype is None:
         return None
 
     NativeDType = tex_module.DType
-    if type(torch_dtype).__name__ == 'DType' and type(torch_dtype).__module__ == 'transformer_engine_fl_torch_hygon':
+    if type(torch_dtype).__name__ == 'DType' and type(torch_dtype).__module__ == 'transformer_engine_torch_hygon':
         return torch_dtype
 
     if hasattr(torch_dtype, 'name') and hasattr(torch_dtype, 'value'):
