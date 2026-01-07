@@ -3,9 +3,9 @@
 # See LICENSE for license information.
 
 """
-CUDA vendor backend operator registrations.
+Hygon vendor backend operator registrations.
 
-This module registers all VENDOR (CUDA) implementations from transformer_engine_torch.
+This module registers all VENDOR (Hygon) implementations from transformer_engine_torch.
 """
 
 from __future__ import annotations
@@ -26,18 +26,18 @@ def _bind_is_available(fn, is_available_fn):
 
 def register_builtins(registry) -> None:
     """
-    Register all CUDA (VENDOR) operator implementations.
+    Register all Hygon (VENDOR) operator implementations.
 
     Args:
         registry: Registry to register into
     """
-    # Import CUDA backend to get all the wrapped tex functions
+    # Import Hygon backend to get all the wrapped tex functions
     from .hygon import HygonBackend
 
     # Create a backend instance to access the methods
     backend = HygonBackend()
 
-    # Check if CUDA is available before registering
+    # Check if Hygon is available before registering
     if not backend.is_available():
         return
 
